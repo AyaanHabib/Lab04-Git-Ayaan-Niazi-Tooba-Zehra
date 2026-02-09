@@ -1,0 +1,52 @@
+.text
+.globl main
+main:
+    li x10, 6          #n = 6
+    jal x1, fib_loop   #fib_loop(n) is being called here, we will run it 6 times fib(6), so we should get 8 as the answer sequence-> 0, 1, 1, 2, 3, 5, 8
+
+    addi x10,x11,0
+    li x10, 1
+    ecall
+    j exit
+
+
+fib_loop:
+    addi sp, sp, -20
+    sw x1, 16(sp)      #ra
+    sw x5, 12(sp)      #a
+    sw x6, 8(sp)       #b
+    sw x7, 4(sp)       #i
+    sw x8, 0(sp)       #temp
+
+
+    li x5, 0           #a = 0
+    li x6, 1           #b = 1
+    li x7, 2           #i = 2, starting at 2 because we already have the values for a and b, hence we only need the sequence after 0, 1
+
+loop:
+    bgt x7, x10, break
+
+    add x8, x5, x6     #temp = a + b
+    addi x5, x6, 0     #a = b 
+    addi x6, x8, 0     #b = temp
+
+    addi x7, x7, 1     #incrementing i, i+=1
+    j loop
+
+
+break:
+    addi x11, x6, 0    #storing the answer in x11, which should be 8 in our case into register x10
+    j finish
+
+finish:
+    lw x8, 0(sp)
+    lw x7, 4(sp)
+    lw x6, 8(sp)
+    lw x5, 12(sp)
+    lw x1, 16(sp)
+    addi sp, sp, 20
+    jalr x0, 0(x1)
+
+
+exit:
+    j exit
