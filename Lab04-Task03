@@ -1,0 +1,86 @@
+.text
+.globl main
+main:
+
+
+li x10, 0x100 #base address of array a
+li x11, 6 #len=0
+
+
+li x6, 20
+sw x6, 0(x10)  #a[0]=20
+li x6, 12
+sw x6, 4(x10)   #a[1]=12- offset by 4 bytes for each new element
+li x6, 5
+sw x6, 8(x10)   #a[2]=5
+li x6, 49
+sw x6, 12(x10)   #a[3]=49
+li x6, 100
+sw x6, 16(x10)   #a[4]=100
+li x6, 50  
+sw x6, 20(x10)   #c[5]=50
+
+
+
+
+jal x1, bubblesort
+j exit
+
+
+bubblesort:
+lw x28, 0(x10)
+beq x28, x0, finish #if a==NULL then exit
+beq x11, x0, finish #if len==0 then exit
+
+
+li x5, 0 #i=0
+for1:
+bge x5, x11, finish #if i>=len then exit
+
+
+addi x7, x5, 0 #j=i
+j for2
+
+
+for2:
+bge x7, x11, endfor1 #if j>=len then go back to outer loop
+
+slli x8, x5, 2 #offset=i*4
+add x8, x8, x10 #base address+offset= address of a[i]
+lw x28, 0(x8) #loads a[i]
+
+
+slli x9, x7, 2 #offset=j*4
+add x9, x9, x10 #base address+offset= address of a[j]
+lw x29, 0(x9) #loads a[j]
+
+
+
+
+bge x28, x29, skip #if a[i]>=a[j]
+addi x30, x28, 0 #temp=a[i]
+addi x28, x29, 0
+addi x29, x30, 0
+
+
+sw x28, 0(x8) #store shifted elements back
+sw x29, 0(x9)
+
+
+skip:
+addi x7, x7, 1 #j++
+j for2
+
+
+endfor1:
+addi x5, x5, 1 #i++
+j for1
+
+
+finish:
+jalr x0, 0(x1)
+
+
+exit:
+    j exit
+
